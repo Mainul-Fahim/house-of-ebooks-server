@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const MongoClient = require('mongodb').MongoClient;
+const ObjectId= require('mongodb').ObjectId;
 const cors=require('cors');
 const bodyParser=require('body-parser');
 require('dotenv').config();
@@ -22,7 +23,27 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect(err => {
     console.log('Error',err);
     const bookCollection = client.db("houseOfBooks").collection("books");
+    const ordersCollection = client.db("houseOfBooks").collection("orders");
 
+      app.get('/books',(req,res) => {
+          bookCollection.find()
+          .toArray((err,items)=>{
+            res.send(items)
+          })
+      })
+
+      app.get('/book/:id',(req,res) => {
+          bookCollection.find({_id: ObjectId(req.params.id)})
+          .toArray((err,items)=>{
+              res.send(items[0])
+          })
+      })
+      app.get('/orders/:id',(req,res) => {
+        ordersCollection.find({_id: ObjectId(req.params.id)})
+        .toArray((err,items)=>{
+            res.send(items[0])
+        })
+    })
       app.post('/addBooks',(req, res) => {
           const newBook=req.body;
           console.log('new book',newBook);
