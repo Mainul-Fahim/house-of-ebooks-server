@@ -38,12 +38,31 @@ client.connect(err => {
               res.send(items[0])
           })
       })
-      app.get('/orders/:id',(req,res) => {
-        ordersCollection.find({_id: ObjectId(req.params.id)})
+      
+      app.delete('/delete/:id',(req,res) => {
+          const id=ObjectId(req.params.id);
+          bookCollection.findOneAndDelete({_id: id})
+          .then(result => {
+            console.log(result);
+            res.send(result.deletedCount>0)
+          })
+      })
+
+      app.get('/orders',(req,res) => {
+        ordersCollection.find({email: req.query.email})
         .toArray((err,items)=>{
-            res.send(items[0])
+            res.send(items)
         })
     })
+
+      app.post('/addOrders',(req,res) => {
+          const orderedBook=req.body;
+          console.log(orderedBook);
+          ordersCollection.insertOne(orderedBook)
+          .then(result => {
+            res.send(result.insertedCount>0)
+          })
+      })
       app.post('/addBooks',(req, res) => {
           const newBook=req.body;
           console.log('new book',newBook);
